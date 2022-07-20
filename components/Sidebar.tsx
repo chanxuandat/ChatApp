@@ -158,7 +158,7 @@ const Sidebar = () => {
 
 			<StyledSearch>
 				<SearchIcon />
-				<StyledSearchInput placeholder='Search in conversations' />
+				<StyledSearchInput placeholder='Tìm kiếm' />
 			</StyledSearch>
 
 			<StyledSidebarButton
@@ -166,7 +166,7 @@ const Sidebar = () => {
 					toggleNewConversationDialog(true)
 				}}
 			>
-				Start a new conversation
+				Bắt đầu
 			</StyledSidebarButton>
 
 			{/* List of conversations */}
@@ -182,15 +182,14 @@ const Sidebar = () => {
 				open={isOpenNewConversationDialog}
 				onClose={closeNewConversationDialog}
 			>
-				<DialogTitle>New Conversation</DialogTitle>
+				<DialogTitle>Tạo tin nhắn mới</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						Please enter a Google email address for the user you wish to chat
-						with
+						Điền địa chỉ google người nhận bên dưới
 					</DialogContentText>
 					<TextField
 						autoFocus
-						label='Email Address'
+						label='Add'
 						type='email'
 						fullWidth
 						variant='standard'
@@ -201,9 +200,9 @@ const Sidebar = () => {
 					/>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={closeNewConversationDialog}>Cancel</Button>
+					<Button onClick={closeNewConversationDialog}>Bỏ</Button>
 					<Button disabled={!recipientEmail} onClick={createConversation}>
-						Create
+						Tạo
 					</Button>
 				</DialogActions>
 			</Dialog>
