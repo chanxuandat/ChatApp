@@ -20,6 +20,7 @@ import * as EmailValidator from 'email-validator'
 import { addDoc, collection, query, where } from 'firebase/firestore'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { Conversation } from '../type'
+import ConversationSelect from './ConversationSelect'
 
 
 const StyledContainer = styled.div`
@@ -28,13 +29,10 @@ const StyledContainer = styled.div`
 	max-width: 350px;
 	overflow-y: scroll;
 	border-right: 1px solid whitesmoke;
-	/* Hide scrollbar for Chrome, Safari and Opera */
 	::-webkit-scrollbar {
 		display: none;
 	}
-	/* Hide scrollbar for IE, Edge and Firefox */
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
+
 `
 
 const StyledHeader = styled.div`
@@ -77,137 +75,139 @@ const StyledSidebarButton = styled(Button)`
 `
 
 const Sidebar = () => {
-	const [loggedInUser, _loading, _error] = useAuthState(auth)
+    const [loggedInUser, _loading, _error] = useAuthState(auth)
 
-	const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] =
-		useState(false)
+    const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] =
+        useState(false)
 
-	const [recipientEmail, setRecipientEmail] = useState('')
+    const [recipientEmail, setRecipientEmail] = useState('')
 
-	const toggleNewConversationDialog = (isOpen: boolean) => {
-		setIsOpenNewConversationDialog(isOpen)
-		if (!isOpen) setRecipientEmail('')
-	}
+    const toggleNewConversationDialog = (isOpen: boolean) => {
+        setIsOpenNewConversationDialog(isOpen)
+        if (!isOpen) setRecipientEmail('')
 
-	const closeNewConversationDialog = () => {
-		toggleNewConversationDialog(false)
-	}
+    }
 
-	// check if conversation already exists between the current logged in user and recipient
-	const queryGetConversationsForCurrentUser = query(
-		collection(db, 'conversations'),
-		where('users', 'array-contains', loggedInUser?.email)
-	)
-	const [conversationsSnapshot, __loading, __error] = useCollection(
-		queryGetConversationsForCurrentUser
-	)
+    const closeNewConversationDialog = () => {
+        toggleNewConversationDialog(false)
+    }
 
-	const isConversationAlreadyExists = (recipientEmail: string) =>
-		conversationsSnapshot?.docs.find(conversation =>
-			(conversation.data() as Conversation).users.includes(recipientEmail)
-		)
+    // check if conversation already exists between the current logged in user and recipient
+    const queryGetConversationsForCurrentUser = query(
+        collection(db, 'conversations'),
+        where('users', 'array-contains', loggedInUser?.email)
+    )
+    const [conversationsSnapshot, __loading, __error] = useCollection(
+        queryGetConversationsForCurrentUser
+    )
 
-	const isInvitingSelf = recipientEmail === loggedInUser?.email
+    const isConversationAlreadyExists = (recipientEmail: string) =>
+        conversationsSnapshot?.docs.find(conversation =>
+            (conversation.data() as Conversation).users.includes(recipientEmail)
+        )
 
-	const createConversation = async () => {
-		if (!recipientEmail) return
+    const isInvitingSelf = recipientEmail === loggedInUser?.email
 
-		if (
-			EmailValidator.validate(recipientEmail) &&
-			!isInvitingSelf &&
-			!isConversationAlreadyExists(recipientEmail)
-		) {
-			// Add conversation user to db "conversations" collection
-			// A conversation is between the currently logged in user and the user invited.
+    const createConversation = async () => {
+        if (!recipientEmail) return
 
-			await addDoc(collection(db, 'conversations'), {
-				users: [loggedInUser?.email, recipientEmail]
-			})
-		}
+        if (
+            EmailValidator.validate(recipientEmail) &&
+            !isInvitingSelf &&
+            !isConversationAlreadyExists(recipientEmail)
+        ) {
+            // Add conversation user to db "conversations" collection
+            // A conversation is between the currently logged in user and the user invited.
 
-		closeNewConversationDialog()
-	}
+            await addDoc(collection(db, 'conversations'), {
+                users: [loggedInUser?.email, recipientEmail]
+            })
+        }
 
-	const logout = async () => {
-		try {
-			await signOut(auth)
-		} catch (error) {
-			console.log('ERROR LOGGING OUT', error)
-		}
-	}
+        closeNewConversationDialog()
+    }
 
-	return (
-		<StyledContainer>
-			<StyledHeader>
-				<Tooltip title={loggedInUser?.email as string} placement='right'>
-					<StyledUserAvatar src={loggedInUser?.photoURL || ''} />
-				</Tooltip>
+    const logout = async () => {
+        try {
+            await signOut(auth)
+        } catch (error) {
+            console.log('ERROR LOGGING OUT', error)
+        }
+    }
 
-				<div>
-					<IconButton>
-						<ChatIcon />
-					</IconButton>
-					<IconButton>
-						<MoreVerticalIcon />
-					</IconButton>
-					<IconButton onClick={logout}>
-						<LogoutIcon />
-					</IconButton>
-				</div>
-			</StyledHeader>
+    return (
+        <StyledContainer>
+            <StyledHeader>
+                <Tooltip title={loggedInUser?.email as string} placement='right'>
+                    <StyledUserAvatar src={loggedInUser?.photoURL || ''} />
+                </Tooltip>
 
-			<StyledSearch>
-				<SearchIcon />
-				<StyledSearchInput placeholder='Tìm kiếm' />
-			</StyledSearch>
+                <div>
+                    <IconButton>
+                        <ChatIcon />
+                    </IconButton>
+                    <IconButton>
+                        <MoreVerticalIcon />
+                    </IconButton>
+                    <IconButton onClick={logout}>
+                        <LogoutIcon />
+                    </IconButton>
+                </div>
+            </StyledHeader>
 
-			<StyledSidebarButton
-				onClick={() => {
-					toggleNewConversationDialog(true)
-				}}
-			>
-				Bắt đầu
-			</StyledSidebarButton>
+            <StyledSearch>
+                <SearchIcon />
+                <StyledSearchInput placeholder='Tìm kiếm' />
+            </StyledSearch>
 
-			{/* List of conversations */}
-			{/* {conversationsSnapshot?.docs.map(conversation => (
-				<ConversationSelect
-					key={conversation.id}
-					id={conversation.id}
-					conversationUsers={(conversation.data() as Conversation).users}
-				/>
-			))} */}
+            <StyledSidebarButton
+                onClick={() => {
+                    toggleNewConversationDialog(true)
+                }}
+            >
+                Bắt đầu
+            </StyledSidebarButton>
 
-			<Dialog
-				open={isOpenNewConversationDialog}
-				onClose={closeNewConversationDialog}
-			>
-				<DialogTitle>Tạo tin nhắn mới</DialogTitle>
-				<DialogContent>
-					<DialogContentText>
-						Điền địa chỉ google người nhận bên dưới
-					</DialogContentText>
-					<TextField
-						autoFocus
-						label='Add'
-						type='email'
-						fullWidth
-						variant='standard'
-						value={recipientEmail}
-						onChange={event => {
-							setRecipientEmail(event.target.value)
-						}}
-					/>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={closeNewConversationDialog}>Bỏ</Button>
-					<Button disabled={!recipientEmail} onClick={createConversation}>
-						Tạo
-					</Button>
-				</DialogActions>
-			</Dialog>
-		</StyledContainer>
-	)
+            {/* List of conversations */}
+            {conversationsSnapshot?.docs.map(conversation => (
+                <ConversationSelect
+                    key={conversation.id}
+                    id={conversation.id}
+                    conversationUsers={(conversation.data() as
+                        Conversation).users}
+                />
+            ))}
+
+            <Dialog
+                open={isOpenNewConversationDialog}
+                onClose={closeNewConversationDialog}
+            >
+                <DialogTitle>Tạo tin nhắn mới</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Điền địa chỉ google người nhận bên dưới.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        label='Add'
+                        type='email'
+                        fullWidth
+                        variant='standard'
+                        value={recipientEmail}
+                        onChange={event => {
+                            setRecipientEmail(event.target.value)
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeNewConversationDialog}>Bỏ</Button>
+                    <Button disabled={!recipientEmail} onClick={createConversation}>
+                        Tạo
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </StyledContainer>
+    )
 }
 
 export default Sidebar

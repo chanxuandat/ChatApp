@@ -2,12 +2,14 @@ import Button from '@mui/material/Button'
 import Head from 'next/head'
 import styled from 'styled-components'
 import Image from 'next/image'
-import WhatsAppLogo from '../assets/logo.png'
+import Kind from '../assets/kind.png'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { auth } from '../config/firebase'
 
+
 const StyledContainer = styled.div`
 	height: 100vh;
+	width: 100wh;
 	display: grid;
 	place-items: center;
 	background-color: whitesmoke;
@@ -35,15 +37,18 @@ const Login = () => {
 	}
 
 	return (
-		<StyledContainer>
+		<div >
 			<Head>
 				<title>Login</title>
 			</Head>
 
+			
+			<StyledContainer>
+
 			<StyledLoginContainer>
 				<StyledImageWrapper>
 					<Image
-						src={WhatsAppLogo}
+						src={Kind}
 						alt='Whatsapp Logo'
 						height='200px'
 						width='200px'
@@ -51,10 +56,11 @@ const Login = () => {
 				</StyledImageWrapper>
 
 				<Button variant='outlined' onClick={signIn}>
-					Button
+					đăng nhập
 				</Button>
 			</StyledLoginContainer>
 		</StyledContainer>
+		</div>
 	)
 }
 
