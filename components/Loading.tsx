@@ -12,6 +12,6 @@ background-color: beige;
 
 export default function Loading() {
   return (
-    <LoadingContainer>chờ....</LoadingContainer>
+    <LoadingContainer>chờ chút....</LoadingContainer>
   )
 }
