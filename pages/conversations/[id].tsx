@@ -38,7 +38,7 @@ const Conversatio = ({ conversation, messages }: Props) => {
 		<StyledContainer>
 			<Head>
 				<title>
-					Conversation with{' '}
+					Đang nhắn với{' '}
 					{getRecipientEmail(conversation.users, loggedInUser)}
 				</title>
 			</Head>
